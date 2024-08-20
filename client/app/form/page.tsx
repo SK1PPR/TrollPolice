@@ -1,8 +1,46 @@
 import { ImageIcon } from "@radix-ui/react-icons";
-import { Box, Button, Checkbox, Flex, Section, Select, Text, TextArea, TextField } from "@radix-ui/themes";
+import {
+  Box,
+  Button,
+  Checkbox,
+  Flex,
+  Section,
+  Select,
+  Text,
+  TextArea,
+  TextField,
+} from "@radix-ui/themes";
 import Navbar from "../components/Navbar";
-
+import {
+  ContractExecuteTransaction,
+  ContractFunctionParameters,
+  AccountId,
+  PrivateKey,
+  Client,
+  FileCreateTransaction,
+  ContractCreateTransaction,
+} from "@hashgraph/sdk";
+import { contractId, POLICE_ADDRESS } from "../constants";
 function CyberForm() {
+  const handleSubmit = async (datahash, tokens_staked) => {
+    const scWrite1 = new ContractExecuteTransaction()
+      .setContractId(contractId)
+      .setGas(100_000)
+      .setFunction(
+        "tipoff",
+        new ContractFunctionParameters()
+          .addUint256(0)
+          .addString(datahash)
+          .addUint256(tokens_staked)
+          .addAddress()
+          .addAddress(POLICE_ADDRESS)
+      );
+    const scWrite1Tx = await scWrite1.execute(client);
+    //   let res = await contract.methods
+    //     .tipoff(0, datahash, tokens_staked, accounts[0], POLICE_ADDRESS)
+    //     .send({ from: accounts[0] });
+    // };
+  };
   return (
     <div className="flex-row">
       <Navbar />
@@ -36,17 +74,28 @@ function CyberForm() {
 
             <Flex direction={"column"} gap={"1"}>
               Platform:
-              <TextField.Root size="3" placeholder="Enter platform on which this occured" />
+              <TextField.Root
+                size="3"
+                placeholder="Enter platform on which this occured"
+              />
             </Flex>
 
             <Flex direction={"column"} gap={"1"}>
               Enter Date:
-              <TextField.Root size="3" type="datetime-local" placeholder="Enter Date" />
+              <TextField.Root
+                size="3"
+                type="datetime-local"
+                placeholder="Enter Date"
+              />
             </Flex>
 
             <Flex direction={"column"} gap={"1"}>
               Number of Tokens Staked:
-              <TextField.Root size="3" type="number" placeholder="Enter number of tokens you will stake" />
+              <TextField.Root
+                size="3"
+                type="number"
+                placeholder="Enter number of tokens you will stake"
+              />
             </Flex>
 
             <Flex direction={"column"} gap={"1"}>
@@ -58,7 +107,8 @@ function CyberForm() {
             </Flex>
 
             <Flex gap="2" className="items-center">
-              <Checkbox defaultChecked color="violet"/>I certify that the information provided is true and accurate
+              <Checkbox defaultChecked color="violet" />I certify that the
+              information provided is true and accurate
             </Flex>
 
             <Button size="3" className="w-full" color="violet">
