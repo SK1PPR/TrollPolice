@@ -20,8 +20,3 @@ body {
   padding: 0;
   margin: 0;
 }
-
-.special-bg {
-  background: radial-gradient(black);
-  /* background: radial-gradient(rgba(34, 50, 175, 0.8), rgb(56, 77, 233) 90%); */
-}

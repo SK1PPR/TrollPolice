@@ -2,9 +2,9 @@ import { Heading, Text } from "@radix-ui/themes";
 import Image from "next/image";
 import Link from "next/link";
 
-function Navbar() {
+function LandingPageNavbar() {
   return (
-    <div className="w-screen flex items-center justify-between shadow-lg ring-1 ring-black/5 bg-slate-800/40 rounded-xl">
+    <div className="w-screen flex items-center justify-between shadow-xl ring-1 ring-black/5 bg-black/10 sticky top-0 bg-gradient-to-br from-violet-950 via-violet-700 to-violet-900">
       <Link href={"/"}>
         <div className="flex items-center p-8 gap-2">
           <Image src={"/cyber-security.png"} width={40} height={40} alt="icon" />
@@ -15,20 +15,23 @@ function Navbar() {
       </Link>
 
       <div className="flex items-center gap-9 p-8 uppercase">
-        <Link href={"/user-dashboard"}>
+        <Link href={"/"}>
           <Text size={"4"} weight={"medium"}>
-            Dashboard
+            Home
           </Text>
         </Link>
-        <Link href={"/form"}>
+        <Link href={"/regulations"}>
           <Text size={"4"} weight={"medium"}>
-            Submit Complaint
+            Regulations
           </Text>
         </Link>
-        <button className="uppercase rounded-3xl text-xl px-7 bg-purple-700 py-1">Logout</button>
+        <Text size={"4"} weight={"medium"}>
+          About
+        </Text>
+        <button className="uppercase rounded-3xl text-xl px-7 bg-purple-700 py-1">Sign In</button>
       </div>
     </div>
   );
 }
 
-export default Navbar;
+export default LandingPageNavbar;
