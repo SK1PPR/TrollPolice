@@ -27,24 +27,23 @@ function LandingPageNavbar() {
   function setUpHashConnectEvents() {
     hashconnect.pairingEvent.on((newPairing) => {
       pairingData = newPairing;
-    })
+    });
 
     hashconnect.disconnectionEvent.on((data) => {
       console.log("you have done something extremelly incorrect");
-      //clepairingData = null;
-    })
+      // pairingData = null;
+    });
 
     hashconnect.connectionStatusChangeEvent.on((connectionStatus) => {
       state = connectionStatus;
-    })
+    });
   }
 
   function sendTransaction(accountId: AccountId, transaction: Transaction) {
-    hashconnect.sendTransaction(accountId, transaction).then(response => {
-
-    }).catch(err => {
-
-    })
+    hashconnect
+      .sendTransaction(accountId, transaction)
+      .then((response) => {})
+      .catch((err) => {});
   }
 
   return (
