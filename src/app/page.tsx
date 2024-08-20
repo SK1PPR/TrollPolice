@@ -1,6 +1,60 @@
+"use client";
+
 import Image from "next/image";
 
+import { HashConnect, HashConnectConnectionState, SessionData } from 'hashconnect';
+import { AccountId, LedgerId, Transaction } from '@hashgraph/sdk';
+
+const appData = {
+  name: "Onboard demo",
+  description: "Testing connect to wallet",
+  icons: ["<Image url>"],
+  url: "localhost"
+}
+
+let hashconnect: HashConnect;
+let state: HashConnectConnectionState = HashConnectConnectionState.Disconnected;
+let pairingData: SessionData;
+
 export default function Home() {
+
+  const handleConnect = async () => {
+    console.log('connect button clicked!');
+
+    hashconnect = new HashConnect(LedgerId.TESTNET, "888a9492c91714f72dda99062e9c3399", appData, true);
+
+    setUpHashConnectEvents();
+
+    await hashconnect.init();
+
+    hashconnect.openPairingModal();
+
+  }
+
+  function setUpHashConnectEvents() {
+    hashconnect.pairingEvent.on((newPairing) => {
+      pairingData = newPairing;
+    })
+
+    hashconnect.disconnectionEvent.on((data) => {
+      console.log("you have done something you shouldn;t have");
+      // pairingData = null;
+    });
+
+    hashconnect.connectionStatusChangeEvent.on((connectionStatus) => {
+      state = connectionStatus;
+    }) 
+
+  }
+
+  function sendTransaction(accountId: AccountId, transaction: Transaction) {
+    hashconnect.sendTransaction(accountId, transaction).then(response => {
+      // handle success
+    }).catch(err => {
+      // handle error
+    })
+  }
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
@@ -108,6 +162,17 @@ export default function Home() {
           </p>
         </a>
       </div>
+
+      {/* Connect Button */}
+      <div className="mt-8">
+        <button
+          onClick={handleConnect}
+          className="rounded-lg bg-blue-500 px-6 py-3 text-white transition-colors hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          Connect
+        </button>
+      </div>
+
     </main>
   );
 }
