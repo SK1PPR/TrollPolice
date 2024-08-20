@@ -1,43 +1,35 @@
-const {
-  TokenType,
-  AccountId,
-  PrivateKey,
-  Client,
-  FileCreateTransaction,
-  ContractCreateTransaction,
-} = require("@hashgraph/sdk");
+const { TokenType, AccountId, PrivateKey, Client } = require("@hashgraph/sdk");
 
 const operatorId = AccountId.fromString(process.env.OPERATOR_ID);
 const operatorKey = PrivateKey.fromString(process.env.OPERATOR_KEY);
 
-const treasuryAccountId = AccountId.fromString(process.env.TREASURY_ID);
+const treasuryId = AccountId.fromString(process.env.TREASURY_ID);
 const treasuryKey = PrivateKey.fromString(process.env.TREASURY_KEY);
 const client = Client.forTestnet();
 client.setOperator(operatorId, operatorKey);
-//Create the transaction and freeze for manual signing
-const transaction = await new TokenCreateTransaction()
-  .setTokenName("TipToken")
+//Create a fungible token
+let tokenCreateTx = await new TokenCreateTransaction()
+  .setTokenName("Tip Token")
   .setTokenSymbol("Tip")
-  .setTreasuryAccountId(treasuryAccountId)
   .setTokenType(TokenType.FungibleCommon)
+  .setDecimals(2)
   .setInitialSupply(10000)
-  .setAdminKey(adminPublicKey)
-  .setMaxTransactionFee(new Hbar(30)) //Change the default max transaction fee
+  .setTreasuryAccountId(treasuryId)
+  .setSupplyType(TokenSupplyType.Infinite)
+  .setSupplyKey(supplyKey)
   .freezeWith(client);
 
-//Sign the transaction with the token adminKey and the token treasury account private key
-const signTx = await (await transaction.sign(adminKey)).sign(treasuryKey);
+//SIGN WITH TREASURY KEY
+let tokenCreateSign = await tokenCreateTx.sign(treasuryKey);
+//SUBMIT THE TRANSACTION
+let tokenCreateSubmit = await tokenCreateSign.execute(client);
+//GET THE TRANSACTION RECEIPT
+let tokenCreateRx = await tokenCreateSubmit.getReceipt(client);
+//GET THE TOKEN ID
+let tokenId = tokenCreateRx.tokenId;
 
-//Sign the transaction with the client operator private key and submit to a Hedera network
-const txResponse = await signTx.execute(client);
-
-//Get the receipt of the transaction
-const receipt = await txResponse.getReceipt(client);
-
-//Get the token ID from the receipt
-const tokenId = receipt.tokenId;
-
-console.log("The new token ID is " + tokenId);
+//LOG THE TOKEN ID TO THE CONSOLE
+console.log(`- Created token with ID: ${tokenId} \n`);
 
 //////
 ////minting
