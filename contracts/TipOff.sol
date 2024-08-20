@@ -11,14 +11,13 @@ contract TipOff is EIP712MetaTransaction("TipOff", "1") {
     mapping(uint => TipToken) public tokencontractinstances;
     uint public contractsregistered = 0;
 
-    mapping(address => string) public registeredTippers;
     /*
         0 - pending
         1 - approved
         2 - rejected
     */
     struct Tipof {
-        string tipid;
+        string tipid;// stored fileId on hedera
         uint tipstatus;
         address payable tipsender;
     }
@@ -39,42 +38,15 @@ contract TipOff is EIP712MetaTransaction("TipOff", "1") {
         approving_police = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
     }
 
-    function swapper(
-        uint instance1,
-        uint instance2,
-        uint amounttoswap,
-        address beneficiary
-    ) public payable {
-        tokencontractinstances[instance1].transfer_From(
-            beneficiary,
-            admin,
-            amounttoswap
-        );
-        tokencontractinstances[instance2].transfer_From(
-            admin,
-            beneficiary,
-            amounttoswap
-        );
-    }
-
     function registerNewContract(TipToken tokenContract) public payable {
         tokencontractinstances[contractsregistered] = tokenContract;
         contractsregistered += 1;
     }
 
-    function onboard(
-        uint instance,
-        string memory aadharhash,
-        address caller
-    ) public payable {
-        // registeredTippers[aadharhash] = caller;
-        registeredTippers[caller] = aadharhash;
+    // can be written on frontend using token service
+    function onboard(uint instance, address caller) public payable {
         tokencontractinstances[instance].transfer_From(admin, caller, 10);
         emit transferred(admin, caller, 10);
-    }
-
-    function checkIfAlreadyRegistered() public view returns (bool) {
-        return bytes(registeredTippers[msg.sender]).length > 0;
     }
 
     function tipoff(
@@ -84,7 +56,6 @@ contract TipOff is EIP712MetaTransaction("TipOff", "1") {
         address payable tipper,
         address police
     ) public payable {
-        // require(msg.sender == approving_police, "not a police");
         Tipof memory tipdata = Tipof(tipid, 0, tipper);
         history[tipid] = tipdata;
         address contractadd = address(this);
@@ -147,35 +118,5 @@ contract TipOff is EIP712MetaTransaction("TipOff", "1") {
         history[tipid].tipstatus = 1;
 
         emit transferred(contractadd, tipdata.tipsender, tipamt + 1);
-    }
-
-    function getTipsByPoliceStation(
-        address police
-    ) public view returns (Tipof[] memory) {
-        // TODO
-        uint n = policeTipCount[police];
-
-        Tipof[] memory tips = new Tipof[](n);
-        for (uint i = 0; i < n; i++) {
-            Tipof memory t = policeToTips[approving_police][
-                policeTipIds[approving_police][i]
-            ];
-            tips[i] = t;
-        }
-
-        return tips;
-    }
-
-    function getTipsByUser() public view returns (Tipof[] memory) {
-        // TODO
-        uint n = userTipCount[msg.sender];
-
-        Tipof[] memory tips = new Tipof[](n);
-        for (uint i = 0; i < n; i++) {
-            Tipof memory t = userToTips[msg.sender][userTipIds[msg.sender][i]];
-            tips[i] = t;
-        }
-
-        return tips;
     }
 }
